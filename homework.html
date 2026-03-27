@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homework - Maharshi Vedvyas</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; padding: 20px; }
+        .header-title { color: #B8860B; text-align: center; margin-bottom: 20px; }
+        .card { 
+            background: white; padding: 15px; border-radius: 12px; margin-bottom: 12px; 
+            border-left: 5px solid #B8860B; display: flex; justify-content: space-between; 
+            align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .btn { 
+            background: #B8860B; color: white; padding: 8px 15px; 
+            border-radius: 5px; text-decoration: none; font-weight: bold; font-size: 14px;
+        }
+        .back-link { display: block; text-align: center; margin-top: 30px; color: #666; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h2 class="header-title">🏠 डेली होमवर्क</h2>
+    <div id="hw-list"></div>
+    <a href="dashboard.html" class="back-link">← वापस डैशबोर्ड पर</a>
+
+    <script>
+        window.onload = function() {
+            const hwList = JSON.parse(localStorage.getItem('appHomework') || "[]");
+            const container = document.getElementById('hw-list');
+            
+            if(hwList.length === 0) {
+                container.innerHTML = "<p style='text-align:center; color:#888;'>अभी कोई होमवर्क अपलोड नहीं किया गया है।</p>";
+                return;
+            }
+
+            hwList.reverse().forEach(item => { // नया होमवर्क ऊपर दिखेगा
+                container.innerHTML += `
+                    <div class="card">
+                        <div>
+                            <strong>${item.title}</strong><br>
+                            <small>कक्षा: ${item.class}</small>
+                        </div>
+                        <a href="${item.link}" class="btn" target="_blank">देखें</a>
+                    </div>`;
+            });
+        }
+    </script>
+</body>
+</html>

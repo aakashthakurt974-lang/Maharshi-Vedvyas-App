@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Admin - Mahrshi Vedvyas</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 15px; }
+        .admin-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); max-width: 600px; margin: auto; }
+        h2 { color: #B8860B; text-align: center; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .section { margin-top: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 10px; background: #fff; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; color: #444; }
+        input, select, textarea { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        .upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        button { width: 100%; padding: 12px; background: #B8860B; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 5px; }
+        button:hover { background: #8B6508; }
+        .back-btn { background: #333; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+<div id="admin-auth" class="admin-card" style="text-align: center;">
+    <img src="https://i.ibb.co/8Dhf204B/1000014674.png" width="60">
+    <h2>एडमिन सत्यापन</h2>
+    <input type="number" id="admin-phone" placeholder="अपना मोबाइल नंबर">
+    <input type="password" id="admin-pin" placeholder="अपना गुप्त कोड">
+    <button onclick="verifyAdmin()">लॉगिन करें</button>
+</div>
+
+<div id="admin-panel" class="admin-card" style="display:none;">
+    <h2>कंट्रोल पैनल (सहदौरा)</h2>
+
+    <div class="section">
+        <label>🖼️ विज्ञापन बदलें (गैलरी से 4 फोटो चुनें)</label>
+        <div class="upload-grid">
+            <div><input type="file" onchange="encodeImg(this, 'ad1Data')"></div>
+            <div><input type="file" onchange="encodeImg(this, 'ad2Data')"></div>
+            <div><input type="file" onchange="encodeImg(this, 'ad3Data')"></div>
+            <div><input type="file" onchange="encodeImg(this, 'ad4Data')"></div>
+        </div>
+        <button onclick="saveAds()">विज्ञापन अपडेट करें</button>
+    </div>
+
+    <div class="section">
+        <label>📢 डैशबोर्ड एनिमेटेड नोटिस</label>
+        <textarea id="notice-input" placeholder="यहाँ नया नोटिस लिखें..."></textarea>
+        <button onclick="saveNotice()">नोटिस सेव करें</button>
+    </div>
+
+    <div class="section" style="background:#eef;">
+        <h3>🏠 होमवर्क / 📝 टेस्ट लिंक अपलोड</h3>
+        
+        <label>प्रकार चुनें:</label>
+        <select id="item-type">
+            <option value="Homework">Homework</option>
+            <option value="Test">Test Series</option>
+        </select>
+
+        <label>कक्षा चुनें:</label>
+        <select id="item-class">
+            <script>for(let i=1;i<=10;i++) document.write(`<option value="${i}">कक्षा ${i}</option>`);</script>
+        </select>
+
+        <label>विषय चुनें:</label>
+        <select id="item-subject">
+            <option value="">-- विषय चुनें --</option>
+            <optgroup label="A. आधारभूत पाठ्यक्रम">
+                <option>हिंदी</option>
+                <option>अंग्रेजी</option>
+                <option>सामाजिक विज्ञान</option>
+                <option>गणित</option>
+                <option>संस्कृत</option>
+                <option>विज्ञान</option>
+            </optgroup>
+            <optgroup label="B. कौशल विकास">
+                <option>मैकेनिक्स</option>
+                <option>इलेक्ट्रॉनिक</option>
+                <option>कंप्यूटर</option>
+                <option>प्रोजेक्ट मेकिंग</option>
+                <option>डिजिटल कौशल</option>
+                <option>कला एवं संगीत</option>
+            </optgroup>
+        </select>
+
+        <input type="text" id="item-title" placeholder="शीर्षक (उदा: विज्ञान टेस्ट 1)">
+        <input type="text" id="item-link" placeholder="लिंक (Google Drive या Google Form)">
+        <button onclick="saveTask()">डेटा सुरक्षित करें</button>
+    </div>
+
+    <button class="back-btn" onclick="location.href='dashboard.html'">वापस डैशबोर्ड पर जाएं</button>
+</div>
+
+<script>
+    let tempAds = {};
+
+    function verifyAdmin() {
+        if(document.getElementById('admin-phone').value === "9516257132" && 
+           document.getElementById('admin-pin').value === "7132") {
+            document.getElementById('admin-auth').style.display = "none";
+            document.getElementById('admin-panel').style.display = "block";
+        } else { alert("गलत विवरण!"); }
+    }
+
+    function encodeImg(input, key) {
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onloadend = function() { tempAds[key] = reader.result; }
+        reader.readAsDataURL(file);
+    }
+
+    function saveAds() {
+        if(tempAds.ad1Data) localStorage.setItem('ad1', tempAds.ad1Data);
+        if(tempAds.ad2Data) localStorage.setItem('ad2', tempAds.ad2Data);
+        if(tempAds.ad3Data) localStorage.setItem('ad3', tempAds.ad3Data);
+        if(tempAds.ad4Data) localStorage.setItem('ad4', tempAds.ad4Data);
+        alert("विज्ञापन अपडेट हो गए!");
+    }
+
+    function saveNotice() {
+        localStorage.setItem('appNotice', document.getElementById('notice-input').value);
+        alert("नोटिस सेव हो गया!");
+    }
+
+    // अपडेटेड सेव फंक्शन (Subject के साथ)
+    function saveTask() {
+        const type = document.getElementById('item-type').value;
+        const cls = document.getElementById('item-class').value;
+        const sub = document.getElementById('item-subject').value;
+        const title = document.getElementById('item-title').value;
+        const link = document.getElementById('item-link').value;
+
+        if(sub && title && link) {
+            let storageKey = (type === 'Homework') ? 'appHomework' : 'appTests';
+            let data = JSON.parse(localStorage.getItem(storageKey) || "[]");
+            
+            // डेटा में subject भी जोड़ दिया गया है
+            data.push({ class: cls, subject: sub, title: title, link: link });
+            
+            localStorage.setItem(storageKey, JSON.stringify(data));
+            alert(sub + " के लिए " + type + " सेव हो गया!");
+        } else { 
+            alert("कृपया विषय, शीर्षक और लिंक तीनों भरें!"); 
+        }
+    }
+</script>
+</body>
+</html>

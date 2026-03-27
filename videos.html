@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Videos - Mahrshi Vedvyas</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 10px; margin: 0; }
+        .header { background: #B8860B; color: white; padding: 20px; text-align: center; border-radius: 0 0 20px 20px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .filter-section { background: white; padding: 15px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin: 0 5px 20px 5px; }
+        label { font-weight: bold; color: #555; display: block; margin-bottom: 5px; font-size: 14px; }
+        select { width: 100%; padding: 12px; margin-bottom: 15px; border: 1.5px solid #eee; border-radius: 10px; font-size: 16px; background: #fafafa; outline: none; }
+        select:focus { border-color: #B8860B; }
+        
+        .video-card { background: white; border-radius: 15px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); border-bottom: 4px solid #B8860B; }
+        .video-container { position: relative; padding-bottom: 56.25%; height: 0; }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        .video-title { padding: 15px; font-weight: bold; font-size: 16px; color: #333; }
+        
+        .no-data { text-align: center; color: #999; padding: 40px; font-style: italic; }
+        .back-btn { display: block; width: 90%; max-width: 300px; margin: 20px auto; padding: 12px; background: #333; color: white; text-align: center; text-decoration: none; border-radius: 10px; font-weight: bold; }
+        optgroup { color: #B8860B; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h2 style="margin:0;">🎥 डिजिटल क्लासरूम</h2>
+    <p style="margin:5px 0 0 0; font-size:12px; opacity:0.9;">महर्षि वेदव्यास संस्थान (सहदौरा)</p>
+</div>
+
+<div class="filter-section">
+    <label>अपनी कक्षा चुनें (1-10):</label>
+    <select id="sel-class" onchange="filterVideos()">
+        <script>
+            for(let i=1; i<=10; i++) {
+                document.write(`<option value="${i}" ${i==10 ? 'selected' : ''}>कक्षा ${i}</option>`);
+            }
+        </script>
+    </select>
+
+    <label>विषय चुनें:</label>
+    <select id="sel-subject" onchange="filterVideos()">
+        <optgroup label="A. आधारभूत पाठ्यक्रम">
+            <option>विज्ञान</option>
+            <option>गणित</option>
+            <option>हिंदी</option>
+            <option>अंग्रेजी</option>
+            <option>सामाजिक विज्ञान</option>
+            <option>संस्कृत</option>
+        </optgroup>
+        <optgroup label="B. कौशल विकास">
+            <option>मैकेनिक्स</option>
+            <option>इलेक्ट्रॉनिक</option>
+            <option>कंप्यूटर</option>
+            <option>प्रोजेक्ट मेकिंग</option>
+            <option>डिजिटल कौशल</option>
+            <option>कला एवं संगीत</option>
+        </optgroup>
+    </select>
+</div>
+
+<div id="video-display"></div>
+
+<a href="dashboard.html" class="back-btn">मुख्य पेज पर वापस जाएं</a>
+
+<script>
+function filterVideos() {
+    const cls = document.getElementById('sel-class').value;
+    const sub = document.getElementById('sel-subject').value;
+    const display = document.getElementById('video-display');
+    
+    // लोकल स्टोरेज से वीडियो डेटा लाना
+    const allVideos = JSON.parse(localStorage.getItem('appVideos') || "[]");
+
+    // फिल्टर करना: चुनी हुई कक्षा और विषय के हिसाब से
+    const filtered = allVideos.filter(v => v.class === cls && v.subject === sub);
+    
+    display.innerHTML = "";
+
+    if(filtered.length === 0) {
+        display.innerHTML = `
+            <div class="no-data">
+                <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" width="50" style="opacity:0.3; margin-bottom:10px;"><br>
+                कक्षा ${cls} के लिए ${sub} का कोई वीडियो अभी अपलोड नहीं किया गया है।
+            </div>`;
+        return;
+    }
+
+    // वीडियो कार्ड बनाना
+    filtered.forEach(v => {
+        display.innerHTML += `
+            <div class="video-card">
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/${v.url}" title="YouTube video player" allowfullscreen></iframe>
+                </div>
+                <div class="video-title">${v.title}</div>
+            </div>`;
+    });
+}
+
+// पेज खुलते ही वीडियो लोड करें
+window.onload = filterVideos;
+</script>
+
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mahrshi Vedvyas Sansthan</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* लॉगिन बॉक्स के लिए थोड़ा स्टाइल */
+        .login-box { margin-top: 20px; display: none; padding: 20px; }
+        input { width: 80%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #B8860B; text-align: center; font-size: 16px; }
+        .otp-btn { background: #B8860B; color: white; padding: 12px 25px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; width: 80%; }
+    </style>
+</head>
+<body onclick="playMusic()"> 
+    
+    <div id="loading-screen" class="splash-container">
+        <div class="logo-box">
+            <img src="https://i.ibb.co/8Dhf204B/1000014674.png" alt="Logo" class="zoom-in-logo">
+            <h2 class="sanskrit-slogan">उद्यमेन हि सिध्यन्ति कार्याणि न मनोरथैः।</h2>
+            
+            <div id="login-section" class="login-box" style="display: block;">
+                <input type="number" id="phone-number" placeholder="अपना मोबाइल नंबर डालें">
+                <button id="sign-in-button" class="otp-btn" onclick="sendOTP()">OTP प्राप्त करें</button>
+            </div>
+
+            <p style="font-size: 10px; color: #ccc; margin-top: 10px;">मोबाइल नंबर डालकर आगे बढ़ें</p>
+        </div>
+    </div>
+
+    <audio id="welcome-audio">
+        <source src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3" type="audio/mpeg">
+    </audio>
+
+    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-app-bundle.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-auth-bundle.js"></script>
+
+    <script>
+        // 2. आपका अपना Firebase कॉन्फ़िगरेशन
+        const firebaseConfig = {
+            apiKey: "AIzaSyDHZBpb0e7XkUmZdheFds2mpcHStdAMepw",
+            authDomain: "maharshi-vedvyas-app.firebaseapp.com",
+            projectId: "maharshi-vedvyas-app",
+            storageBucket: "maharshi-vedvyas-app.firebasestorage.app",
+            messagingSenderId: "876921715108",
+            appId: "1:876921715108:web:7061c46412db12f0d32931"
+        };
+
+        // Firebase को चालू करें
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // अदृश्य कैप्चा (सुरक्षा के लिए)
+        window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('sign-in-button', {
+            'size': 'invisible'
+        });
+
+        // 3. असली OTP भेजने का फंक्शन
+        function sendOTP() {
+            const phone = document.getElementById('phone-number').value;
+            if (phone.length < 10) {
+                alert("कृपया सही मोबाइल नंबर डालें!");
+                return;
+            }
+
+            const phoneNumber = "+91" + phone;
+            const appVerifier = window.recaptchaVerifier;
+
+            firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
+                .then((confirmationResult) => {
+                    window.confirmationResult = confirmationResult;
+                    
+                    // OTP पूछने के लिए प्रॉम्प्ट
+                    let code = prompt("आपके मोबाइल पर 6 अंकों का OTP भेजा गया है, उसे यहाँ भरें:");
+                    
+                    if (code) {
+                        confirmationResult.confirm(code).then((result) => {
+                            // सफलता!
+                            localStorage.setItem('userName', 'आकाश ठाकुर'); 
+                            window.location.href = "dashboard.html";
+                        }).catch((error) => {
+                            alert("गलत OTP! कृपया फिर से प्रयास करें।");
+                        });
+                    }
+                }).catch((error) => {
+                    alert("OTP भेजने में समस्या: " + error.message);
+                });
+        }
+
+        // आपका पुराना म्यूजिक फंक्शन
+        function playMusic() {
+            const audio = document.getElementById('welcome-audio');
+            audio.play().catch(() => { /* User interaction needed */ });
+        }
+    </script>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Series - Maharshi Vedvyas</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #f4f7f6; padding: 15px; text-align: center; }
+        
+        .header { background: #B8860B; color: white; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
+        
+        /* Selection Box Style */
+        .selection-container { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ccc; font-size: 16px; outline: none; }
+        
+        .section-title { background: #eee; padding: 8px; font-weight: bold; margin-top: 15px; border-radius: 5px; color: #B8860B; }
+        
+        /* Test Card Style */
+        .test-list-container { margin-top: 20px; text-align: left; }
+        .test-card { 
+            background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-left: 5px solid #28a745; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .start-btn { background: #28a745; color: white; padding: 8px 15px; border-radius: 5px; text-decoration: none; font-weight: bold; }
+        
+        .back-btn { display: block; width: 100%; padding: 15px; background: #333; color: white; text-align: center; text-decoration: none; border-radius: 10px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2>📝 ऑनलाइन टेस्ट सीरीज</h2>
+        <p>महर्षि वेदव्यास संस्थान</p>
+    </div>
+
+    <div class="selection-container">
+        <h4>अपना विवरण चुनें</h4>
+        
+        <select id="select-class" onchange="filterTests()">
+            <option value="">-- कक्षा चुनें --</option>
+            <script>for(let i=1; i<=10; i++) document.write(`<option value="${i}">कक्षा ${i}</option>`);</script>
+        </select>
+
+        <div class="section-title">विषय चुनें</div>
+        <select id="select-subject" onchange="filterTests()">
+            <option value="">-- विषय चुनें --</option>
+            <optgroup label="A. आधारभूत पाठ्यक्रम">
+                <option>हिंदी</option>
+                <option>अंग्रेजी</option>
+                <option>सामाजिक विज्ञान</option>
+                <option>गणित</option>
+                <option>संस्कृत</option>
+                <option>विज्ञान</option>
+            </optgroup>
+            <optgroup label="B. कौशल विकास">
+                <option>मैकेनिक्स</option>
+                <option>इलेक्ट्रॉनिक</option>
+                <option>कंप्यूटर</option>
+                <option>प्रोजेक्ट मेकिंग</option>
+                <option>डिजिटल कौशल</option>
+                <option>कला एवं संगीत</option>
+            </optgroup>
+        </select>
+    </div>
+
+    <div id="test-display" class="test-list-container">
+        <p style="color: #888; text-align: center;">कक्षा और विषय चुनने के बाद टेस्ट यहाँ दिखाई देंगे।</p>
+    </div>
+
+    <a href="dashboard.html" class="back-btn">← वापस डैशबोर्ड पर</a>
+
+    <script>
+        function filterTests() {
+            const selectedClass = document.getElementById('select-class').value;
+            const selectedSubject = document.getElementById('select-subject').value;
+            const display = document.getElementById('test-display');
+            
+            // LocalStorage से टेस्ट डेटा लेना
+            const allTests = JSON.parse(localStorage.getItem('appTests') || "[]");
+
+            if(!selectedClass || !selectedSubject) {
+                display.innerHTML = '<p style="color: #888; text-align: center;">कृपया कक्षा और विषय दोनों चुनें।</p>';
+                return;
+            }
+
+            // डेटा फिल्टर करना
+            const filtered = allTests.filter(t => t.class === selectedClass && t.subject === selectedSubject);
+
+            if(filtered.length === 0) {
+                display.innerHTML = '<p style="color: red; text-align: center;">माफ करें, इस चुनाव के लिए अभी कोई टेस्ट उपलब्ध नहीं है।</p>';
+            } else {
+                display.innerHTML = "";
+                filtered.reverse().forEach(test => {
+                    display.innerHTML += `
+                        <div class="test-card">
+                            <div>
+                                <strong>${test.title}</strong><br>
+                                <small>${selectedSubject} | कक्षा ${selectedClass}</small>
+                            </div>
+                            <a href="${test.link}" class="start-btn" target="_blank">टेस्ट दें</a>
+                        </div>`;
+                });
+            }
+        }
+    </script>
+</body>
+</html>

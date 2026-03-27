@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes - Maharshi Vedvyas</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #fdfaf1; padding: 15px; text-align: center; }
+        
+        .header { background: #B8860B; color: white; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
+        
+        .selection-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1.2px solid #B8860B; font-size: 16px; font-weight: bold; }
+        
+        .section-title { background: #B8860B; color: white; padding: 8px; margin-top: 15px; border-radius: 5px; font-weight: bold; font-size: 14px; }
+        
+        .subject-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .sub-btn { 
+            background: white; padding: 15px; border-radius: 10px; border: 1.5px solid #B8860B; 
+            color: #444; font-weight: bold; cursor: pointer; text-decoration: none; font-size: 13px;
+            display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .sub-btn:active { background: #B8860B; color: white; }
+
+        .footer-btns { margin-top: 30px; padding-bottom: 20px; }
+        .btn-back { display: block; width: 100%; padding: 12px; background: #444; color: white; text-decoration: none; border-radius: 8px; margin-bottom: 10px; font-weight: bold; }
+        .btn-home { display: block; width: 100%; padding: 12px; background: #B8860B; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2>📚 डिजिटल लाइब्रेरी (नोट्स)</h2>
+        <p>महर्षि वेदव्यास संस्थान (सहदौरा)</p>
+    </div>
+
+    <div class="selection-card">
+        <label><strong>1. अपनी कक्षा चुनें:</strong></label>
+        <select id="notes-class">
+            <option value="">-- यहाँ से चुनें --</option>
+            <script>for(let i=1; i<=10; i++) document.write(`<option value="${i}">कक्षा ${i}</option>`);</script>
+        </select>
+
+        <div class="section-title">A. आधारभूत पाठ्यक्रम (विषय चुनें)</div>
+        <div class="subject-grid">
+            <a href="HINDI_LINK" class="sub-btn">1. हिंदी</a>
+            <a href="ENGLISH_LINK" class="sub-btn">2. अंग्रेजी</a>
+            <a href="SOCIAL_LINK" class="sub-btn">3. सामाजिक विज्ञान</a>
+            <a href="MATH_LINK" class="sub-btn">4. गणित</a>
+            <a href="SANSKRIT_LINK" class="sub-btn">5. संस्कृत</a>
+            <a href="SCIENCE_LINK" class="sub-btn">6. विज्ञान</a>
+        </div>
+
+        <div class="section-title">B. कौशल विकास एवं अन्य</div>
+        <div class="subject-grid">
+            <a href="MECH_LINK" class="sub-btn">1. मैकेनिक्स</a>
+            <a href="ELEC_LINK" class="sub-btn">2. इलेक्ट्रॉनिक</a>
+            <a href="COMP_LINK" class="sub-btn">3. कंप्यूटर</a>
+            <a href="PROJ_LINK" class="sub-btn">4. प्रोजेक्ट मेकिंग</a>
+            <a href="DIGITAL_LINK" class="sub-btn">5. डिजिटल कौशल</a>
+            <a href="ART_LINK" class="sub-btn">6. कला एवं संगीत</a>
+        </div>
+    </div>
+
+    <div class="footer-btns">
+        <a href="#" onclick="history.back(); return false;" class="btn-back">← पीछे जाएं (Back)</a>
+        <a href="dashboard.html" class="btn-home">🏠 मुख्य डैशबोर्ड (Dashboard)</a>
+    </div>
+
+    <script>
+        // सुरक्षा के लिए: बिना कक्षा चुने लिंक नहीं खुलेगा
+        document.querySelectorAll('.sub-btn').forEach(button => {
+            button.onclick = function(e) {
+                const cls = document.getElementById('notes-class').value;
+                if(!cls) {
+                    alert("कृपया पहले अपनी कक्षा चुनें!");
+                    e.preventDefault();
+                }
+            };
+        });
+    </script>
+</body>
+</html>
