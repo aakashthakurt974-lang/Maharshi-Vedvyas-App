@@ -112,7 +112,6 @@
     </div>
 
     <script>
-        // Firebase Initialize
         const firebaseConfig = {
           apiKey: "AIzaSyDHZBpb0e7XkUmZdheFds2mpcHStdAMepw",
           authDomain: "maharshi-vedvyas-app.firebaseapp.com",
@@ -127,12 +126,18 @@
         let totalAds = 0;
 
         window.onload = function() {
-            // लॉगिन चेक और प्रोफाइल लोड
             firebase.auth().onAuthStateChanged((user) => {
                 if (user) {
                     const savedName = localStorage.getItem('userName') || user.displayName;
                     document.getElementById('display-name').innerText = savedName;
-                    if(user.photoURL) document.getElementById('user-pfp').src = user.photoURL;
+                    
+                    // --- फोटो लॉजिक में बदलाव ---
+                    const myUploadedPic = localStorage.getItem('userProfilePic');
+                    const googlePic = user.photoURL;
+                    const defaultPic = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
+
+                    // अगर नई फोटो है तो वो दिखाओ, वरना गूगल वाली
+                    document.getElementById('user-pfp').src = myUploadedPic || googlePic || defaultPic;
                 } else {
                     window.location.href = "login.html";
                 }
@@ -154,7 +159,7 @@
             });
 
             if(totalAds === 0) {
-                adContent = `<img src="https://via.placeholder.com/600x200?text=Welcome+to+Mahrshi+Vedvyas">`;
+                adContent = `<img src="https://via.placeholder.com/600x200?text=Welcome+to+Mahrshi+Vedas">`;
                 totalAds = 1;
             }
 
