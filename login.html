@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Mahrshi Vedvyas</title>
-    <link rel="manifest" href="manifest.json">
     
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
@@ -12,7 +11,7 @@
     <style>
         body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #fdfaf1; font-family: sans-serif; }
         .login-card { background: white; padding: 40px 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 90%; max-width: 400px; text-align: center; border-top: 5px solid #B8860B; }
-        .login-card img { width: 100px; margin-bottom: 20px; border-radius: 50%; border: 2px solid #B8860B; }
+        .login-card img.main-logo { width: 100px; height: 100px; margin-bottom: 20px; border-radius: 50%; border: 2px solid #B8860B; object-fit: cover; }
         h2 { color: #333; margin-bottom: 10px; font-size: 24px; }
         p { color: #666; font-size: 15px; margin-bottom: 30px; }
         
@@ -32,18 +31,18 @@
             transition: 0.3s;
         }
         .google-btn:hover { background: #f1f1f1; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .google-btn img { width: 20px; height: 20px; margin-right: 10px; border: none; margin-bottom: 0; }
+        .google-btn img.g-icon { width: 22px; height: 22px; margin-right: 12px; border: none; }
     </style>
 </head>
 <body>
 
     <div class="login-card">
-        <img src="https://i.ibb.co/8Dhf204B/1000014674.png" alt="Logo">
+        <img src="https://i.ibb.co/8Dhf204B/1000014674.png" alt="Logo" class="main-logo">
         <h2>नमस्ते!</h2>
         <p>महर्षि वेदव्यास संस्थान में आपका स्वागत है। आगे बढ़ने के लिए गूगल से लॉगिन करें।</p>
         
         <button class="google-btn" onclick="googleLogin()">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/action/google.svg" alt="Google Logo">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google Logo" class="g-icon">
             Google से लॉगिन करें
         </button>
     </div>
@@ -62,28 +61,22 @@
 
         function googleLogin() {
             const provider = new firebase.auth.GoogleAuthProvider();
-            firebase.auth().signInWithPopup(provider)
-                .then((result) => {
-                    // Login successful!
-                    const user = result.user;
-                    console.log("Logged in as: ", user.displayName);
-                    window.location.href = "profile.html"; 
-                }).catch((error) => {
-                    // Agar Popup block ho jaye toh Redirect use karein
-                    if (error.code === 'auth/popup-closed-by-user') {
-                        return;
-                    }
-                    firebase.auth().signInWithRedirect(provider);
-                });
+            // मोबाइल के लिए Redirect सबसे बेहतर है
+            firebase.auth().signInWithRedirect(provider);
         }
         
-        // Redirect hone ke baad handle karne ke liye
+        // Redirect होने के बाद यह हिस्सा डेटा चेक करेगा
         firebase.auth().getRedirectResult().then((result) => {
             if (result.user) {
-                window.location.href = "profile.html";
+                console.log("लॉगिन सफल:", result.user.displayName);
+                // सफल होने पर सीधा प्रोफाइल या डैशबोर्ड पर भेजें
+                window.location.href = "profile.html"; 
+            }
+        }).catch((error) => {
+            if (error.code !== 'auth/invalid-pending-token') {
+                console.error("लॉगिन एरर:", error.message);
             }
         });
     </script>
 </body>
 </html>
-
