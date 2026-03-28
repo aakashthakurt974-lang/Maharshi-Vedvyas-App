@@ -4,85 +4,89 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Mahrshi Vedvyas</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    
     <style>
-        body {
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background: #f4f7f6;
-            font-family: sans-serif;
-        }
-        .login-card {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-        }
-        .login-card img {
-            width: 80px;
-            margin-bottom: 20px;
-        }
-        h2 { color: #333; margin-bottom: 10px; }
-        p { color: #666; font-size: 14px; margin-bottom: 25px; }
-        input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            outline: none;
-        }
-        button {
-            width: 100%;
-            padding: 12px;
-            background: #B8860B;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
+        body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #fdfaf1; font-family: sans-serif; }
+        .login-card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 90%; max-width: 400px; text-align: center; border-top: 5px solid #B8860B; }
+        .login-card img { width: 90px; margin-bottom: 15px; border-radius: 50%; border: 2px solid #B8860B; }
+        h2 { color: #333; margin-bottom: 5px; font-size: 22px; }
+        p { color: #666; font-size: 14px; margin-bottom: 20px; }
+        input { width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #eee; border-radius: 8px; font-size: 16px; outline: none; box-sizing: border-box; transition: 0.3s; }
+        input:focus { border-color: #B8860B; }
+        button { width: 100%; padding: 14px; background: #B8860B; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
         button:hover { background: #8B6508; }
+        #recaptcha-container { margin: 15px 0; display: flex; justify-content: center; }
+        .error { color: red; font-size: 12px; margin-top: -10px; margin-bottom: 10px; display: none; }
     </style>
 </head>
 <body>
 
     <div class="login-card">
         <img src="https://i.ibb.co/8Dhf204B/1000014674.png" alt="Logo">
-        <h2>लॉगिन करें</h2>
-        <p>आगे बढ़ने के लिए अपना 10 अंकों का मोबाइल नंबर दर्ज करें</p>
+        <h2>नमस्ते!</h2>
+        <p>महर्षि वेदव्यास संस्थान में आपका स्वागत है</p>
         
-        <input type="number" id="phone" placeholder="मोबाइल नंबर (10 अंक)" maxlength="10">
-        <button onclick="sendOTP()">OTP भेजें</button>
-        
-        <div id="otp-section" style="display:none; margin-top:20px;">
-            <input type="number" id="otp" placeholder="6 अंकों का OTP डालें">
-            <button onclick="verifyOTP()">आगे बढ़ें</button>
+        <div id="phone-input-section">
+            <input type="number" id="phone" placeholder="अपना मोबाइल नंबर डालें" oninput="if(this.value.length > 10) this.value = this.value.slice(0, 10);">
+            <div id="recaptcha-container"></div>
+            <button id="send-btn" onclick="sendOTP()">OTP भेजें</button>
+        </div>
+
+        <div id="otp-section" style="display:none;">
+            <p style="color: green; font-weight: bold;">OTP आपके नंबर पर भेज दिया गया है।</p>
+            <input type="number" id="otp" placeholder="6 अंकों का OTP डालें" oninput="if(this.value.length > 6) this.value = this.value.slice(0, 6);">
+            <button onclick="verifyOTP()">सत्यापित करें और आगे बढ़ें</button>
         </div>
     </div>
 
     <script>
+        // आपकी Firebase Config मैंने यहाँ जोड़ दी है
+        const firebaseConfig = {
+          apiKey: "AIzaSyDHZBpb0e7XkUmZdheFds2mpcHStdAMepw",
+          authDomain: "maharshi-vedvyas-app.firebaseapp.com",
+          projectId: "maharshi-vedvyas-app",
+          storageBucket: "maharshi-vedvyas-app.firebasestorage.app",
+          messagingSenderId: "876921715108",
+          appId: "1:876921715108:web:7061c46412db12f0d32931"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+
+        window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+            'size': 'normal'
+        });
+
         function sendOTP() {
             const phone = document.getElementById('phone').value;
             if(phone.length === 10) {
-                alert("OTP आपके नंबर " + phone + " पर भेज दिया गया है (Demo)");
-                document.getElementById('otp-section').style.display = 'block';
+                const phoneNumber = "+91" + phone;
+                const appVerifier = window.recaptchaVerifier;
+
+                firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
+                    .then((confirmationResult) => {
+                        window.confirmationResult = confirmationResult;
+                        document.getElementById('phone-input-section').style.display = 'none';
+                        document.getElementById('otp-section').style.display = 'block';
+                    }).catch((error) => {
+                        alert("त्रुटि: " + error.message);
+                        location.reload(); 
+                    });
             } else {
-                alert("कृपया सही 10 अंकों का नंबर डालें");
+                alert("कृपया वैध 10 अंकों का नंबर डालें");
             }
         }
 
         function verifyOTP() {
             const otp = document.getElementById('otp').value;
             if(otp.length === 6) {
-                window.location.href = "profile.html"; // इसके बाद प्रोफाइल सेटअप पेज पर जाएंगे
+                confirmationResult.confirm(otp).then((result) => {
+                    alert("लॉगिन सफल रहा!");
+                    window.location.href = "profile.html"; 
+                }).catch((error) => {
+                    alert("गलत OTP, कृपया फिर से प्रयास करें।");
+                });
             } else {
                 alert("कृपया 6 अंकों का सही OTP डालें");
             }
