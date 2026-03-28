@@ -15,7 +15,7 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background: #fdfaf1; /* आपके ऐप की थीम के अनुसार */
+            background: #fdfaf1;
             font-family: 'Segoe UI', sans-serif;
         }
         .profile-card {
@@ -51,7 +51,7 @@
             font-size: 40px;
             color: #B8860B;
             font-weight: bold;
-            display: none; /* Google Photo आने पर प्लस छुप जाएगा */
+            display: none;
         }
         h3 { color: #333; margin-bottom: 20px; }
         
@@ -76,6 +76,19 @@
             font-weight: bold;
             cursor: pointer;
             transition: 0.3s;
+            margin-bottom: 10px;
+        }
+        /* नया बैक बटन स्टाइल */
+        .btn-back {
+            width: 100%;
+            padding: 12px;
+            background: #555;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
             margin-bottom: 10px;
         }
         .btn-logout {
@@ -121,12 +134,12 @@
             <option value="10">कक्षा 10</option>
         </select>
 
-        <button class="btn-submit" onclick="saveProfile()">आगे बढ़ें</button>
+        <button class="btn-submit" onclick="saveProfile()">जानकारी सेव करें</button>
+        <button class="btn-back" onclick="window.location.href='dashboard.html'">डैशबोर्ड पर वापस जाएँ</button>
         <button class="btn-logout" onclick="logout()">लॉग आउट (Log Out)</button>
     </div>
 
     <script>
-        // Firebase Configuration (Aakash, ise check karein)
         const firebaseConfig = {
           apiKey: "AIzaSyDHZBpb0e7XkUmZdheFds2mpcHStdAMepw",
           authDomain: "maharshi-vedvyas-app.firebaseapp.com",
@@ -138,15 +151,17 @@
         
         firebase.initializeApp(firebaseConfig);
 
-        // Check if User is Logged In
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
-                // Google se naam aur photo apne aap load karna
-                document.getElementById('user-name').value = user.displayName;
+                // अगर पहले से नाम सेव है तो वो दिखाओ, वरना Google वाला नाम
+                const savedName = localStorage.getItem('userName');
+                const savedClass = localStorage.getItem('userClass');
+                
+                document.getElementById('user-name').value = savedName || user.displayName;
                 document.getElementById('user-img').src = user.photoURL;
+                if(savedClass) document.getElementById('user-class').value = savedClass;
                 document.getElementById('plus-text').style.display = "none";
             } else {
-                // Agar login nahi hai toh login.html par bhej do
                 window.location.href = "login.html";
             }
         });
@@ -169,7 +184,7 @@
             if(name && userClass) {
                 localStorage.setItem('userName', name);
                 localStorage.setItem('userClass', userClass);
-                alert("नमस्ते " + name + ", प्रोफाइल सेव हो गई!");
+                alert("नमस्ते " + name + ", आपकी जानकारी सुरक्षित कर ली गई है!");
                 window.location.href = "dashboard.html"; 
             } else {
                 alert("कृपया नाम और कक्षा दोनों भरें");
@@ -179,11 +194,11 @@
         function logout() {
             if(confirm("क्या आप वाकई लॉग आउट करना चाहते हैं?")) {
                 firebase.auth().signOut().then(() => {
+                    localStorage.clear(); // लॉग आउट पर डेटा साफ़ करना
                     window.location.href = "login.html";
                 });
             }
         }
     </script>
 </body>
-    </html>
-    
+</html>
