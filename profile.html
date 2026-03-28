@@ -78,7 +78,6 @@
             transition: 0.3s;
             margin-bottom: 10px;
         }
-        /* नया बैक बटन स्टाइल */
         .btn-back {
             width: 100%;
             padding: 12px;
@@ -153,12 +152,13 @@
 
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
-                // अगर पहले से नाम सेव है तो वो दिखाओ, वरना Google वाला नाम
                 const savedName = localStorage.getItem('userName');
                 const savedClass = localStorage.getItem('userClass');
+                const savedPic = localStorage.getItem('userProfilePic');
                 
                 document.getElementById('user-name').value = savedName || user.displayName;
-                document.getElementById('user-img').src = user.photoURL;
+                // अगर localStorage में फोटो है तो वो दिखाओ, वरना Google वाली
+                document.getElementById('user-img').src = savedPic || user.photoURL;
                 if(savedClass) document.getElementById('user-class').value = savedClass;
                 document.getElementById('plus-text').style.display = "none";
             } else {
@@ -180,10 +180,13 @@
         function saveProfile() {
             const name = document.getElementById('user-name').value;
             const userClass = document.getElementById('user-class').value;
+            const userImg = document.getElementById('user-img').src; // फोटो का डेटा लें
 
             if(name && userClass) {
                 localStorage.setItem('userName', name);
                 localStorage.setItem('userClass', userClass);
+                localStorage.setItem('userProfilePic', userImg); // <--- फोटो यहाँ सेव हो रही है
+                
                 alert("नमस्ते " + name + ", आपकी जानकारी सुरक्षित कर ली गई है!");
                 window.location.href = "dashboard.html"; 
             } else {
@@ -194,11 +197,12 @@
         function logout() {
             if(confirm("क्या आप वाकई लॉग आउट करना चाहते हैं?")) {
                 firebase.auth().signOut().then(() => {
-                    localStorage.clear(); // लॉग आउट पर डेटा साफ़ करना
+                    localStorage.clear();
                     window.location.href = "login.html";
                 });
             }
         }
     </script>
 </body>
-</html>
+    </html>
+    
