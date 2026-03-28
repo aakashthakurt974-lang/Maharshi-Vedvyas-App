@@ -58,23 +58,34 @@
         };
         
         firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
 
+        // बदलाव 1: लॉगिन को पक्का बनाने के लिए Persistence सेट किया
         function googleLogin() {
             const provider = new firebase.auth.GoogleAuthProvider();
-            // मोबाइल के लिए Redirect सबसे बेहतर है
-            firebase.auth().signInWithRedirect(provider);
+            auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+                .then(() => {
+                    return auth.signInWithRedirect(provider);
+                })
+                .catch((error) => {
+                    console.error("Persistence Error:", error.message);
+                });
         }
         
-        // Redirect होने के बाद यह हिस्सा डेटा चेक करेगा
-        firebase.auth().getRedirectResult().then((result) => {
-            if (result.user) {
-                console.log("लॉगिन सफल:", result.user.displayName);
-                // सफल होने पर सीधा प्रोफाइल या डैशबोर्ड पर भेजें
+        // बदलाव 2: Redirect रिजल्ट को बेहतर तरीके से हैंडल किया
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                console.log("यूजर पहले से लॉगिन है:", user.displayName);
                 window.location.href = "profile.html"; 
-            }
-        }).catch((error) => {
-            if (error.code !== 'auth/invalid-pending-token') {
-                console.error("लॉगिन एरर:", error.message);
+            } else {
+                auth.getRedirectResult().then((result) => {
+                    if (result && result.user) {
+                        window.location.href = "profile.html";
+                    }
+                }).catch((error) => {
+                    console.log("Login Error Code:", error.code);
+                    // अगर Missing Initial State आए, तो पेज रीलोड न करें, बस एरर दिखाएं
+                });
             }
         });
     </script>
