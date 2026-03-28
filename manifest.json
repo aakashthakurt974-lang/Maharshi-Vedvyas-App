@@ -1,0 +1,20 @@
+{
+  "name": "Maharshi Vedvyas Sansthan",
+  "short_name": "Vedvyas App",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#B8860B",
+  "icons": [
+    {
+      "src": "https://i.ibb.co/8Dhf204B/1000014674.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://i.ibb.co/8Dhf204B/1000014674.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
