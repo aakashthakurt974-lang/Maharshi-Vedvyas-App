@@ -64,7 +64,10 @@
             <span class="admin-gear" onclick="checkAdminAccess()">⚙️</span>
         </div>
         <div style="display: flex; align-items: center; gap: 8px; cursor: pointer;" onclick="window.location.href='profile.html'">
-            <span id="display-name" style="font-weight: bold;">Student</span>
+            <div style="text-align: right;">
+                <span id="display-name" style="font-weight: bold; display: block; font-size: 14px;">Student</span>
+                <span id="display-class" style="font-size: 11px; color: #B8860B; font-weight: bold;">प्रोफाइल सेट करें ></span>
+            </div>
             <img id="user-pfp" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="user-profile">
         </div>
     </div>
@@ -104,9 +107,16 @@
             firebase.auth().onAuthStateChanged((user) => {
                 if (user) {
                     const savedName = localStorage.getItem('userName') || user.displayName;
-                    document.getElementById('display-name').innerText = savedName;
+                    const savedClass = localStorage.getItem('userClass');
                     const myUploadedPic = localStorage.getItem('userProfilePic');
+
+                    document.getElementById('display-name').innerText = savedName;
                     document.getElementById('user-pfp').src = myUploadedPic || user.photoURL || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
+                    
+                    // कक्षा दिखाने का लॉजिक
+                    if(savedClass) {
+                        document.getElementById('display-class').innerText = "कक्षा: " + savedClass;
+                    }
                 } else { window.location.href = "login.html"; }
             });
 
@@ -163,5 +173,4 @@
         }
     </script>
 </body>
-            </html>
-            
+</html>
