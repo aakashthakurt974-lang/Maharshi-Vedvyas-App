@@ -1,46 +1,167 @@
-<script>
-    // ... (बाकी सब सेम रहेगा, बस window.onload वाले हिस्से में ये बदलाव है)
-    window.onload = function() {
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Mahrshi Vedvyas</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #f4f7f6; color: #333; overflow-x: hidden; }
+
+        .header {
+            display: flex; justify-content: space-between; align-items: center;
+            background: white; padding: 12px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .app-logo { height: 45px; }
+        .admin-gear { font-size: 20px; cursor: pointer; filter: grayscale(1); transition: 0.3s; }
+        .admin-gear:hover { filter: grayscale(0); transform: rotate(90deg); }
+        
+        .user-profile { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #B8860B; cursor: pointer; object-fit: cover; }
+
+        .notice-bar { background: #B8860B; color: white; padding: 8px; overflow: hidden; white-space: nowrap; }
+        .notice-content { display: inline-block; animation: scroll 15s linear infinite; }
+        @keyframes scroll { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+
+        .slider { 
+            width: 100%; 
+            height: 180px; 
+            margin: 10px 0; 
+            background: #eee; 
+            overflow: hidden; 
+            position: relative;
+        }
+        .slider-wrapper {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s ease-in-out;
+        }
+        .slider-wrapper img { 
+            width: 100vw; 
+            height: 100%; 
+            object-fit: cover; 
+            flex-shrink: 0;
+        }
+
+        .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 15px; }
+        .menu-btn {
+            background: white; padding: 20px; border-radius: 12px; text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); font-weight: bold; border-bottom: 4px solid #B8860B;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="header-left">
+            <img src="https://i.ibb.co/8Dhf204B/1000014674.png" class="app-logo">
+            <span class="admin-gear" onclick="checkAdminAccess()">⚙️</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; cursor: pointer;" onclick="window.location.href='profile.html'">
+            <span id="display-name" style="font-weight: bold;">लोड हो रहा है...</span>
+            <img id="user-pfp" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="user-profile">
+        </div>
+    </div>
+
+    <div class="notice-bar">
+        <div id="app-notice" class="notice-content">महर्षि वेदव्यास संस्थान (सहदौरा) में आपका स्वागत है!</div>
+    </div>
+
+    <div class="slider">
+        <div id="slider-wrapper" class="slider-wrapper"></div>
+    </div>
+
+    <div class="grid-container">
+        <div class="menu-btn" onclick="openLive()">🔴 Live (YouTube)</div>
+        <div class="menu-btn" onclick="openChat()">💬 Chat (WhatsApp)</div>
+        <div class="menu-btn" onclick="showSubjects('Video')">🎥 Video Lectures</div>
+        <div class="menu-btn" onclick="showSubjects('Notes')">📚 Notes/PDF</div>
+        <div class="menu-btn" onclick="showSubjects('Test')">📝 Test Series</div>
+        <div class="menu-btn" onclick="showSubjects('Homework')">🏠 Homework</div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyDHZBpb0e7XkUmZdheFds2mpcHStdAMepw",
+          authDomain: "maharshi-vedvyas-app.firebaseapp.com",
+          projectId: "maharshi-vedvyas-app",
+          storageBucket: "maharshi-vedvyas-app.firebasestorage.app",
+          messagingSenderId: "876921715108",
+          appId: "1:876921715108:web:7061c46412db12f0d32931"
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        let currentSlide = 0;
+        let totalAds = 0;
+
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
-                const savedName = localStorage.getItem('userName') || user.displayName;
+                const savedName = localStorage.getItem('userName') || user.displayName || "विद्यार्थी";
                 document.getElementById('display-name').innerText = savedName;
                 const myUploadedPic = localStorage.getItem('userProfilePic');
                 document.getElementById('user-pfp').src = myUploadedPic || user.photoURL || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
-            } else { window.location.href = "login.html"; }
-        });
-
-        const wrapper = document.getElementById('slider-wrapper');
-        const adKeys = ['ad1', 'ad2', 'ad3', 'ad4'];
-        let adContent = "";
-        totalAds = 0; // इसे ग्लोबल रखने के लिए यहाँ रीसेट किया
-
-        adKeys.forEach((key) => {
-            const imgData = localStorage.getItem(key);
-            if(imgData) {
-                adContent += `<img src="${imgData}" style="width: 100vw;">`;
-                totalAds++;
+            } else {
+                window.location.href = "login.html";
             }
         });
 
-        if(totalAds === 0) {
-            adContent = `<img src="https://via.placeholder.com/600x200?text=Welcome+to+Mahrshi+Vedvyas" style="width: 100vw;">`;
-            totalAds = 1;
+        window.onload = function() {
+            // सूचना (Notice) लोड करें
+            const savedNotice = localStorage.getItem('appNotice');
+            if(savedNotice) document.getElementById('app-notice').innerText = savedNotice;
+
+            // विज्ञापनों (Ads) को लोड करें
+            const wrapper = document.getElementById('slider-wrapper');
+            const adKeys = ['ad1', 'ad2', 'ad3', 'ad4'];
+            let adContent = "";
+
+            adKeys.forEach((key) => {
+                const imgData = localStorage.getItem(key);
+                if(imgData) {
+                    adContent += `<img src="${imgData}">`;
+                    totalAds++;
+                }
+            });
+
+            if(totalAds === 0) {
+                adContent = `<img src="https://via.placeholder.com/600x200?text=महर्षि+वेदव्यास+संस्थान">`;
+                totalAds = 1;
+            }
+
+            wrapper.innerHTML = adContent;
+            wrapper.style.width = (totalAds * 100) + "%";
+            if(totalAds > 1) startSlider();
+        };
+
+        function startSlider() {
+            const wrapper = document.getElementById('slider-wrapper');
+            setInterval(() => {
+                currentSlide = (currentSlide + 1) % totalAds;
+                wrapper.style.transform = `translateX(-${(currentSlide * 100) / totalAds}%)`;
+            }, 3500); 
         }
 
-        wrapper.innerHTML = adContent;
-        // पक्का किया कि विड्थ सही हो ताकि चारों दिखें
-        wrapper.style.width = (totalAds * 100) + "vw"; 
-        if(totalAds > 1) startSlider();
-    };
+        function checkAdminAccess() {
+            let phone = prompt("एडमिन मोबाइल नंबर:");
+            if (phone === "9516257132") {
+                let pin = prompt("पासवर्ड डालें:");
+                if (pin === "7132") { window.location.href = "admin.html"; }
+                else { alert("गलत पासवर्ड!"); }
+            } else { alert("अनुमति नहीं है!"); }
+        }
 
-    function startSlider() {
-        const wrapper = document.getElementById('slider-wrapper');
-        setInterval(() => {
-            currentSlide = (currentSlide + 1) % totalAds;
-            // स्लाइड को खिसकाने का सही तरीका
-            wrapper.style.transform = `translateX(-${currentSlide * 100}vw)`;
-        }, 3500); 
-    }
-        </script>
-        
+        function openLive() { window.open("https://youtube.com/@axelacadmy-im3pb?si=BZUaCRhIudi7_smI1", "_blank"); }
+        function openChat() { window.open("https://wa.me/919516257132", "_blank"); }
+        function showSubjects(type) {
+            if(type === 'Notes') window.location.href = "notes.html";
+            else alert(type + " सेक्शन पर काम चल रहा है।");
+        }
+    </script>
+</body>
+</html>
