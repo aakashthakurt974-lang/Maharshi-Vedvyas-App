@@ -29,7 +29,7 @@
 
         .slider { 
             width: 100%; 
-            height: 180px; 
+            height: 160px; 
             margin: 10px 0; 
             background: #eee; 
             overflow: hidden; 
@@ -64,7 +64,7 @@
             <span class="admin-gear" onclick="checkAdminAccess()">⚙️</span>
         </div>
         <div style="display: flex; align-items: center; gap: 8px; cursor: pointer;" onclick="window.location.href='profile.html'">
-            <span id="display-name" style="font-weight: bold;">लोड हो रहा है...</span>
+            <span id="display-name" style="font-weight: bold;">Student</span>
             <img id="user-pfp" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="user-profile">
         </div>
     </div>
@@ -100,23 +100,19 @@
         let currentSlide = 0;
         let totalAds = 0;
 
-        firebase.auth().onAuthStateChanged((user) => {
-            if (user) {
-                const savedName = localStorage.getItem('userName') || user.displayName || "विद्यार्थी";
-                document.getElementById('display-name').innerText = savedName;
-                const myUploadedPic = localStorage.getItem('userProfilePic');
-                document.getElementById('user-pfp').src = myUploadedPic || user.photoURL || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
-            } else {
-                window.location.href = "login.html";
-            }
-        });
-
         window.onload = function() {
-            // सूचना (Notice) लोड करें
+            firebase.auth().onAuthStateChanged((user) => {
+                if (user) {
+                    const savedName = localStorage.getItem('userName') || user.displayName;
+                    document.getElementById('display-name').innerText = savedName;
+                    const myUploadedPic = localStorage.getItem('userProfilePic');
+                    document.getElementById('user-pfp').src = myUploadedPic || user.photoURL || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
+                } else { window.location.href = "login.html"; }
+            });
+
             const savedNotice = localStorage.getItem('appNotice');
             if(savedNotice) document.getElementById('app-notice').innerText = savedNotice;
 
-            // विज्ञापनों (Ads) को लोड करें
             const wrapper = document.getElementById('slider-wrapper');
             const adKeys = ['ad1', 'ad2', 'ad3', 'ad4'];
             let adContent = "";
@@ -124,18 +120,18 @@
             adKeys.forEach((key) => {
                 const imgData = localStorage.getItem(key);
                 if(imgData) {
-                    adContent += `<img src="${imgData}">`;
+                    adContent += `<img src="${imgData}" style="width: 100vw;">`;
                     totalAds++;
                 }
             });
 
             if(totalAds === 0) {
-                adContent = `<img src="https://via.placeholder.com/600x200?text=महर्षि+वेदव्यास+संस्थान">`;
+                adContent = `<img src="https://via.placeholder.com/600x200?text=Welcome+to+Mahrshi+Vedvyas" style="width: 100vw;">`;
                 totalAds = 1;
             }
 
             wrapper.innerHTML = adContent;
-            wrapper.style.width = (totalAds * 100) + "%";
+            wrapper.style.width = (totalAds * 100) + "vw";
             if(totalAds > 1) startSlider();
         };
 
@@ -143,25 +139,29 @@
             const wrapper = document.getElementById('slider-wrapper');
             setInterval(() => {
                 currentSlide = (currentSlide + 1) % totalAds;
-                wrapper.style.transform = `translateX(-${(currentSlide * 100) / totalAds}%)`;
+                wrapper.style.transform = `translateX(-${currentSlide * 100}vw)`;
             }, 3500); 
         }
 
         function checkAdminAccess() {
-            let phone = prompt("एडमिन मोबाइल नंबर:");
+            let phone = prompt("एडमिन सत्यापन: अपना मोबाइल नंबर दर्ज करें");
             if (phone === "9516257132") {
-                let pin = prompt("पासवर्ड डालें:");
+                let pin = prompt("अपना 4 अंकों का गुप्त कोड डालें");
                 if (pin === "7132") { window.location.href = "admin.html"; }
-                else { alert("गलत पासवर्ड!"); }
-            } else { alert("अनुमति नहीं है!"); }
+                else { alert("गलत पिन!"); }
+            } else { alert("अनधिकृत एक्सेस!"); }
         }
 
         function openLive() { window.open("https://youtube.com/@axelacadmy-im3pb?si=BZUaCRhIudi7_smI1", "_blank"); }
         function openChat() { window.open("https://wa.me/919516257132", "_blank"); }
+
         function showSubjects(type) {
-            if(type === 'Notes') window.location.href = "notes.html";
-            else alert(type + " सेक्शन पर काम चल रहा है।");
+            if(type === 'Video') { window.location.href = "videos.html"; } 
+            else if(type === 'Notes') { window.location.href = "notes.html"; } 
+            else if(type === 'Homework') { window.location.href = "homework.html"; } 
+            else if(type === 'Test') { window.location.href = "test.html"; } 
         }
     </script>
 </body>
-</html>
+            </html>
+            
